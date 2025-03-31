@@ -1,0 +1,44 @@
+{
+    "name": "com.fuzzphyte.game",
+    "version": "0.1.0",
+    "displayName": "FP Game",
+    "description": "FP Game is a library to setup base 'game managers'. This is an extension of Utility and Events combined.",
+    "unity": "2022.3",
+    "unityRelease": "32f1",
+    "documentationUrl": "https://github.com/jshull/FP_Game/blob/main/README.md",
+    "changelogUrl": "https://github.com/JShull/FP_Game/blob/main/CHANGELOG.md",
+    "licensesUrl": "https://github.com/jshull/FP_Game/blob/main/LICENSE.md",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/jshull/FP_Game.git"
+    },
+    "dependencies": {
+      "com.unity.mathematics": "1.2.6",
+      "com.unity.textmeshpro": "3.0.9",
+      "com.unity.ugui":"2.0.0",
+      "com.unity.burst":"1.8.18",
+      "com.fuzzphyte.utility":"https://github.com/jshull/FP_Utility.git",
+      "com.fuzzphyte.systemevent":"https://github.com/jshull/FP_Event.git",
+      "com.fuzzphyte.ui":"https://github.com/jshull/FP_UI.git",
+      "com.fuzzphyte.utility.analytics":"https://github.com/JShull/FP_Utility_Analytics.git"
+    },
+    "samples": [
+      {
+        "displayName": "Utility Samples",
+        "description": "Includes base examples for creating your own bootstrap and game manager",
+        "path": "Samples~/SamplesURP"
+      }
+    ],
+    "keywords": [
+      "ScriptableObject",
+      "FuzzPhyte",
+      "Tool",
+      "Game"
+    ],
+    "author": {
+      "name": "John Shull",
+      "email": "the.john.shull@gmail.com",
+      "url": "https://github.com/jshull"
+    },
+    "type": "tool"
+  }

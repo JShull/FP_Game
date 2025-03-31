@@ -1,0 +1,23 @@
+{
+    "name": "com.fuzzphyte.game",
+    "rootNamespace": "FuzzPhyte.Game",
+    "references": [
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.TextMeshPro",
+        "com.fuzzphyte.utility",
+        "com.fuzzphyte.systemevent",
+        "com.fuzzphyte.utility.fpsystem",
+        "com.fuzzphyte.ui",
+        "com.fuzzphyte.utility.analytics"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
