@@ -24,7 +24,7 @@
     },
     "samples": [
       {
-        "displayName": "Utility Samples",
+        "displayName": "Game Samples",
         "description": "Includes base examples for creating your own bootstrap and game manager",
         "path": "Samples~/SamplesURP"
       }
