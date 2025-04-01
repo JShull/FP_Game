@@ -44,8 +44,10 @@ namespace FuzzPhyte.Game.Samples
         /// </summary>
         public override void StartEngine()
         {
+            GameClock.TheClock.StartClockReporter();
             base.StartEngine();
-            if(TheMeasureToolButton != null)
+           
+            if (TheMeasureToolButton != null)
             {
                TheMeasureToolButton.interactable = true;
             }
