@@ -51,6 +51,8 @@ namespace FuzzPhyte.Game
         public AudioSource GameTenSecondsAudio;
         [Tooltip("All button clicky sounds")]
         public AudioSource UIButtonAudio;
+        [Tooltip("Other Item Sound")]
+        public AudioSource OtherAudioSource;
         #endregion
         #region UI Related
         [Header("UI Related")]
@@ -185,13 +187,11 @@ namespace FuzzPhyte.Game
 
         public virtual void ResetEngine()
         {
-            //throw new NotImplementedException();
             OnGameResetEvent?.Invoke();
         }
 
         public virtual void SetupEngine(FP_Data Data)
         {
-            //throw new NotImplementedException();
             OnGameSetupEvent?.Invoke(Data);
         }
 
@@ -200,7 +200,6 @@ namespace FuzzPhyte.Game
         /// </summary>
         public virtual void StartEngine()
         {
-            //throw new NotImplementedException();
             OnGameStartedEvent?.Invoke();
         }
 
@@ -209,7 +208,6 @@ namespace FuzzPhyte.Game
         /// </summary>
         public virtual void StopEngine()
         {
-            //throw new NotImplementedException();
             OnGameFinishedEvent?.Invoke();
             OnGameFinishedUnityEvent.Invoke();
         }
@@ -286,6 +284,18 @@ namespace FuzzPhyte.Game
             {
                 UIButtonAudio.clip = clip;
                 UIButtonAudio.Play();
+            }
+        }
+        /// <summary>
+        /// Play some sound triggered by whatever you want
+        /// </summary>
+        /// <param name="clip"></param>
+        public virtual void PlayOtherAudio(AudioClip clip)
+        {
+            if (OtherAudioSource != null) 
+            {
+                OtherAudioSource.clip = clip;
+                OtherAudioSource.Play();
             }
         }
         #endregion
