@@ -134,6 +134,10 @@ namespace FuzzPhyte.Game
                 }
             }
         }
+        public virtual void LateUpdate()
+        {
+
+        }
         public virtual void OnScoreUpdated(float score)
         {
             RunningScore += score;

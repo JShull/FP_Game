@@ -15,14 +15,14 @@ namespace FuzzPhyte.Game
         public float MaxGameTimeSeconds=300;
         public delegate void ClockTimerDelegate();
         public ClockTimerDelegate TimerStart;
-        private bool _timerStarted;
+        protected bool _timerStarted;
         public ClockTimerDelegate TimerEnd;
         public ClockTimerDelegate TenSecondsLeft;
-        private bool _timerTenFinished;
-        private bool _timerEnded;
+        protected bool _timerTenFinished;
+        protected bool _timerEnded;
 
 
-        public void Start()
+        public virtual void Start()
         {
             if(TheClock!=null){
                 var curTheme = TheClock.TheReporterDetails.StatTheme;
@@ -40,7 +40,7 @@ namespace FuzzPhyte.Game
                 }
             }
         }
-        public void ClockRunning()
+        public virtual void ClockRunning()
         {
             if(TheClock!=null)
             {
@@ -68,7 +68,7 @@ namespace FuzzPhyte.Game
                 }
             }
         }
-        public void LateUpdate()
+        public virtual void LateUpdate()
         {
             if(TheClock.RunningClock)
             {
@@ -80,14 +80,14 @@ namespace FuzzPhyte.Game
                 ClockRunning();
             } 
         }
-        public void PauseClock()
+        public virtual void PauseClock()
         {
             if(TheClock!=null)
             {
                 TheClock.PauseTimer();
             }
         }
-        public void ResumeClock()
+        public virtual void ResumeClock()
         {
             if(TheClock!=null)
             {
