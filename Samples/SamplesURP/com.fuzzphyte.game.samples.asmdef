@@ -1,6 +1,6 @@
 {
-    "name": "com.fuzzphyte.game",
-    "rootNamespace": "FuzzPhyte.Game",
+    "name": "com.fuzzphyte.game.samples",
+    "rootNamespace": "FuzzPhyte.Game.Samples",
     "references": [
         "Unity.Mathematics",
         "Unity.TextMeshPro",
@@ -9,7 +9,9 @@
         "com.fuzzphyte.utility.fpsystem",
         "com.fuzzphyte.ui",
         "com.fuzzphyte.utility.analytics",
-        "com.fuzzphyte.tools"
+        "com.fuzzphyte.game",
+        "com.fuzzphyte.ui.samples",
+        "com.fuzzphyte.tools.samples"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

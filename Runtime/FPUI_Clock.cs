@@ -12,7 +12,8 @@ namespace FuzzPhyte.Game
         public Image ClockBackDrop;
         public Image ClockOutline;
         public TextMeshProUGUI ClockText;
-        public float MaxGameTimeSeconds=300;
+       
+        [SerializeField]protected float MaxGameTimeSeconds=300;
         public delegate void ClockTimerDelegate();
         public ClockTimerDelegate TimerStart;
         protected bool _timerStarted;
@@ -21,6 +22,21 @@ namespace FuzzPhyte.Game
         protected bool _timerTenFinished;
         protected bool _timerEnded;
 
+        public virtual void SetupClock(float timer)
+        {
+            if (TheClock != null && !_timerStarted)
+            {
+                MaxGameTimeSeconds = timer;
+                UpdateVisualClockInfo(MaxGameTimeSeconds);
+            }
+            else
+            {
+                //don't want to modify the clock timer if the clock is already running as this system is just comparing this value to how much time has passed on our FP_Stat_GameClock
+                //this works one way if we increase the amount (make sure we are never updating it with less value than we started with) but that doesn't really make any sense
+                //if you wanted to update the timer value we'd have to write in additional logic to do the math
+                Debug.LogError($"The clock has already started and/or you don't have a clock!");
+            }
+        }
 
         public virtual void Start()
         {
@@ -40,17 +56,19 @@ namespace FuzzPhyte.Game
                 }
             }
         }
+        
         public virtual void ClockRunning()
         {
             if(TheClock!=null)
             {
-                if(clockReporter==null){
+                if(clockReporter==null)
+                {
                     clockReporter = TheClock.ReturnStatReporter();
-                    
                 }else{
                     var remainTime = MaxGameTimeSeconds-TheClock.AdjustDoubleTimeSecondsForPause();
-                    int minutes = (int)(remainTime / 60f);
-                    int seconds = (int)(remainTime % 60f);
+                    UpdateVisualClockInfo(remainTime);
+                    //int minutes = (int)(remainTime / 60f);
+                    //int seconds = (int)(remainTime % 60f);
         
                     if(remainTime<=0&&!_timerEnded){
                         ClockText.text = "00.00";
@@ -58,7 +76,6 @@ namespace FuzzPhyte.Game
                         TheClock.EndTimer();
                         TimerEnd?.Invoke();
                     }else{
-                        ClockText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
                         if(remainTime<=10&&!_timerEnded && !_timerTenFinished)
                         {
                             TenSecondsLeft?.Invoke();
@@ -79,6 +96,12 @@ namespace FuzzPhyte.Game
                 }
                 ClockRunning();
             } 
+        }
+        protected virtual void UpdateVisualClockInfo(float timeRemain)
+        {
+            int minutes = (int)(timeRemain / 60f);
+            int seconds = (int)(timeRemain % 60f);
+            ClockText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         }
         public virtual void PauseClock()
         {

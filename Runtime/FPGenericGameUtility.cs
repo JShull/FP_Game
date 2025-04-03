@@ -11,11 +11,14 @@ namespace FuzzPhyte.Game
     using UnityEngine.UI;
     using UnityEngine.Audio;
     using System.Collections;
+    using FuzzPhyte.Utility.Audio;
 
     public abstract class FPGenericGameUtility : FPSystemBase<FP_Data>, IFPGame<FP_Data, FPEvent>
     {
         [Tooltip("Clock Reference in Scene")]
         public FPUI_Clock GameClock;
+        [Tooltip("Amount of time to set up the clock with")]
+        public float GameTimer = 30;
         [Header("Standard Game End Events")]
         public UnityEvent TenSecondsToGoEvent;
         public UnityEvent OnGameFinishedUnityEvent;
@@ -66,30 +69,39 @@ namespace FuzzPhyte.Game
         public TextMeshProUGUI FINALScoreText;
         public TextMeshProUGUI ScoreText;
         #endregion
-        #region Private Game State Variables
+        #region Game State Variables
         [Header("Protected Game State Variables")]
         [SerializeField] protected float proximityValue;
         [SerializeField] protected float RunningScore;
         [SerializeField] protected bool pausedGame=false;
-        public bool PausedGame { get => pausedGame;}
-        [Header("Random Game Seed")]
-        [SerializeField] protected uint mainSeed;
-        protected Unity.Mathematics.Random gameRNG;
+        public bool PausedGame { get => pausedGame; }
         protected bool accumulateScore;
         protected bool _gameOverStarted;
         protected bool dataInitialized;
+       
+        [Header("Random Game Seed")]
+        public bool UseSeed=false;
+        [SerializeField] protected uint mainSeed=4242424242;
+        protected Unity.Mathematics.Random gameRNG;
+        //public Unity.Mathematics.Random GameRNG { get => gameRNG;}
+        
         #endregion
         
         public override void Start()
         {
             if(GameClock!=null)
             {
+                GameClock.SetupClock(GameTimer);
                 GameClock.TimerStart += OnClockStart;
                 GameClock.TimerEnd += OnClockEnd;
                 GameClock.TenSecondsLeft+= OnClockTenSecondsLeft;
             }
-            gameRNG = new Unity.Mathematics.Random(mainSeed);
-            lastAudioMixerValue=0;
+            gameRNG = new Unity.Mathematics.Random(FP_UtilityData.ReturnUINTByDate(DateTime.Now));
+            if (UseSeed)
+            {
+                gameRNG = new Unity.Mathematics.Random(mainSeed);
+            }
+            lastAudioMixerValue = 0;
             //Audio setup
             if(UIButtonAudio!=null)
             {
@@ -155,16 +167,40 @@ namespace FuzzPhyte.Game
         {
             accumulateScore=false;
             _gameOverStarted=true;
-            GameOverAudio.Play();
-            GameTenSecondsAudio.Stop();
+            if (GameOverAudio != null)
+            {
+                if (GameOverAudio.gameObject.GetComponent<FP_RampAudio>())
+                {
+                    //use the ramp instead
+                    GameOverAudio.gameObject.GetComponent<FP_RampAudio>().ActivateRamp();
+                }
+                else
+                {
+                    GameOverAudio.Play();
+                }
+            }
             StartCoroutine(LerpTransparency());
         }
         public virtual void OnClockTenSecondsLeft()
         {
             TenSecondsToGoEvent?.Invoke();
-            GameTenSecondsAudio.Play();
-            //assign random audio from the RandomEndWinSounds too the AudioSource GameOverAudio
-            GameOverAudio.clip = RandomEndWinSounds[gameRNG.NextInt(0,RandomEndWinSounds.Count)];
+            if (GameTenSecondsAudio != null)
+            {
+                if (GameTenSecondsAudio.gameObject.GetComponent<FP_RampAudio>())
+                {
+                    //use the ramp instead
+                    GameTenSecondsAudio.gameObject.GetComponent<FP_RampAudio>().ActivateRamp();
+                }
+                else
+                {
+                    GameTenSecondsAudio.Play();
+                }
+            }
+            if (GameOverAudio != null && RandomEndWinSounds.Count>0) 
+            {
+                GameOverAudio.clip = RandomEndWinSounds[gameRNG.NextInt(0, RandomEndWinSounds.Count)];
+            }
+           
         }
         public virtual void ProcessEvent(FPEvent eventData)
         {

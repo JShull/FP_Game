@@ -2,7 +2,7 @@
 
 ## Game
 
-FP_Game is a combination of Utility and Events to produce a generic enough base class for a "game manager" that lets you run and manage most simple 2D/3D games and their high level game manager states.
+FP_Game is a combination of Utility and Events to produce a generic enough base class for a "game manager" that lets you run and manage most simple 2D/3D games and their high level game manager states - it is a higher level set of scripts designed around using multiple FP Libraries.
 
 ## Setup & Design
 
