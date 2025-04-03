@@ -10,7 +10,7 @@ namespace FuzzPhyte.Game
         public void ResetEngine();
         public void StopEngine();
         public void ProcessEvent(A eventData);
-        public System.Collections.IEnumerator LerpTransparency();
+        //public System.Collections.IEnumerator LerpTransparency();
     }
     /// <summary>
     /// Static class for game functions and data
