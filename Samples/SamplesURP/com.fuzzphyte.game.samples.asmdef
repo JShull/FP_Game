@@ -12,7 +12,8 @@
         "com.fuzzphyte.game",
         "com.fuzzphyte.ui.samples",
         "com.fuzzphyte.tools",
-        "com.fuzzphyte.tools.samples"
+        "com.fuzzphyte.tools.samples",
+        "com.fuzzphyte.tools.connections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

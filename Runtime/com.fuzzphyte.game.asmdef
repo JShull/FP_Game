@@ -9,7 +9,8 @@
         "com.fuzzphyte.utility.fpsystem",
         "com.fuzzphyte.ui",
         "com.fuzzphyte.utility.analytics",
-        "com.fuzzphyte.tools"
+        "com.fuzzphyte.tools",
+        "com.fuzzphyte.tools.connections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

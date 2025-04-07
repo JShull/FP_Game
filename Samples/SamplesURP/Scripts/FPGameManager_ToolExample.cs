@@ -6,6 +6,8 @@ namespace FuzzPhyte.Game.Samples
     using UnityEngine.Events;
     using FuzzPhyte.Tools;
     using System.Collections.Generic;
+    using FuzzPhyte.Tools.Connections;
+    using FuzzPhyte.UI;
 
     public class FPGameManager_ToolExample : FPGenericGameUtility
     {
@@ -13,10 +15,13 @@ namespace FuzzPhyte.Game.Samples
         [Header("FP Game Manager Tool Example")]
         public FPGameUIMouseListener fPGameUIMouseListenerLeftScreen;
         public FPGameUIMouseListener fPGameUIMouseListenerRightScreen;
+        public FPGameUIMouseListenerMove fPGameUIMouseListenerPartsMove;
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsLeft = new List<FP_Tool<FP_MeasureToolData>>();
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsRight = new List<FP_Tool<FP_MeasureToolData>>();
+        public List<FP_Tool<PartData>> AllPartsToolRight = new List<FP_Tool<PartData>>();
         public Button TheMeasureTool2DButton;
         public Button TheMeasureTool3DButton;
+        public Button TheMovePanToolButton;
         public UnityEvent OnUnityGamePausedEvent;
         public UnityEvent OnUnityGameUnPausedEvent;
        
@@ -66,6 +71,10 @@ namespace FuzzPhyte.Game.Samples
             {
                 TheMeasureTool3DButton.interactable = true;
             }
+            if(TheMovePanToolButton!=null)
+            {
+                TheMovePanToolButton.interactable=true;
+            }
             // we want to stop make sure our overview UI isn't blocking our Tools requirements (OnDrag etc)
         }
         public override void OnClockEnd()
@@ -86,6 +95,10 @@ namespace FuzzPhyte.Game.Samples
             if(TheMeasureTool3DButton!=null)
             {
                 TheMeasureTool3DButton.interactable = false;
+            }
+            if(TheMovePanToolButton!=null)
+            {
+                TheMovePanToolButton.interactable=false;
             }
         }
         public override void PauseEngine()
@@ -169,6 +182,48 @@ namespace FuzzPhyte.Game.Samples
                         {
                             fPGameUIMouseListenerRightScreen.UnregisterListener(castedInterface);
                             fPGameUIMouseListenerRightScreen.ResetCurrentEngagedData();
+                        };
+                    }
+
+                }
+                else
+                {
+                    Debug.LogError($"The Tool {theTool} is not in the list of tools!");
+                }
+            }
+            else
+            {
+                Debug.LogError($"The GameObject you passed me, {thePassedTool.name}, does not have a FP_Tool<FP_MeasureToolData> component on it!");
+            }
+        }
+        /// <summary>
+        /// Called from the UI Button to activate the Move/Pan Tool
+        /// </summary>
+        /// <param name="thePassedTool"></param>
+        public void UIMovePanToolButtonPushed(GameObject thePassedTool)
+        {
+            var theTool = thePassedTool.GetComponent<FP_Tool<PartData>>();
+            if (theTool != null)
+            {
+                if (AllPartsToolRight.Contains(theTool))
+                {
+                    //set the current tool
+                    fPGameUIMouseListenerPartsMove.SetCurrentEngagedData(theTool);
+                    fPGameUIMouseListenerPartsMove.SetCurrentEngagedGameObject(theTool.gameObject);
+                    //activate the tool with it's own data
+                    theTool.Initialize(theTool.ToolData);
+                    theTool.ActivateTool();
+                    //register the tool 
+                    IFPUIEventListener<FP_Tool<PartData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<PartData>>;
+                    if (castedInterface != null)
+                    {
+                        //tell our mouse listener to register the current tool
+                        fPGameUIMouseListenerPartsMove.RegisterListener(castedInterface);
+                        //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
+                        theTool.OnDeactivated += (tool) =>
+                        {
+                            fPGameUIMouseListenerPartsMove.UnregisterListener(castedInterface);
+                            fPGameUIMouseListenerPartsMove.ResetCurrentEngagedData();
                         };
                     }
 
