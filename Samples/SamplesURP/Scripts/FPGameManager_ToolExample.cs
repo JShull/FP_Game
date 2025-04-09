@@ -13,6 +13,7 @@ namespace FuzzPhyte.Game.Samples
     {
         [Space]
         [Header("FP Game Manager Tool Example")]
+        protected GameObject currentGameObjectTool;
         public FPGameUIMouseListener fPGameUIMouseListenerLeftScreen;
         public FPGameUIMouseListener fPGameUIMouseListenerRightScreen;
         public FPGameUIMouseListenerMove fPGameUIMouseListenerPartsMove;
@@ -22,8 +23,10 @@ namespace FuzzPhyte.Game.Samples
         public Button TheMeasureTool2DButton;
         public Button TheMeasureTool3DButton;
         public Button TheMovePanToolButton;
+        //public Image ButtonSelectionIcon;
         public UnityEvent OnUnityGamePausedEvent;
         public UnityEvent OnUnityGameUnPausedEvent;
+
        
         #region Overrides
         public override void Start()
@@ -100,6 +103,7 @@ namespace FuzzPhyte.Game.Samples
             {
                 TheMovePanToolButton.interactable=false;
             }
+            ForceResetPreviousTool();
         }
         public override void PauseEngine()
         {
@@ -112,37 +116,52 @@ namespace FuzzPhyte.Game.Samples
             OnUnityGameUnPausedEvent?.Invoke();
         }
         #endregion
+        protected void ForceResetPreviousTool()
+        {
+            if(currentGameObjectTool!=null)
+            {
+                //we had a previous tool and it might be in some sort of 'state' 
+                //we need to deactivate it 
+                IFPTool castToolInterface = currentGameObjectTool.GetComponent<IFPTool>();
+                castToolInterface.ForceDeactivateTool();
+            }
+        }
         /// <summary>
         /// Public UI function to be called from the UI Button
         /// </summary>
         /// <param name="thePassedTool">GameObject that contains FP_Tool</param>
         public void UI2DToolButtonPushed(GameObject thePassedTool)
         {
+            //check if we had a previous gameObject tool
+            ForceResetPreviousTool();
             var theTool = thePassedTool.GetComponent<FP_Tool<FP_MeasureToolData>>();
             if (theTool != null)
             {
                 if (AllMeasureToolsLeft.Contains(theTool))
                 {
                     //set the current tool
-                    fPGameUIMouseListenerLeftScreen.SetCurrentEngagedData(theTool);
-                    fPGameUIMouseListenerLeftScreen.SetCurrentEngagedGameObject(theTool.gameObject);
-                    //activate the tool with it's own data
+                    currentGameObjectTool = thePassedTool;
+                    fPGameUIMouseListenerLeftScreen.UI_ToolActivated(theTool);
                     theTool.Initialize(theTool.ToolData);
-                    theTool.ActivateTool();
+                    
                     //register the tool 
                     IFPUIEventListener<FP_Tool<FP_MeasureToolData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<FP_MeasureToolData>>;
                     if (castedInterface != null)
                     {
                         //tell our mouse listener to register the current tool
-                        fPGameUIMouseListenerLeftScreen.RegisterListener(castedInterface);
+                        theTool.OnActivated+=(tool)=>
+                        {
+                            fPGameUIMouseListenerLeftScreen.RegisterListener(castedInterface);
+                        };
                         //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
                         theTool.OnDeactivated += (tool) =>
                         {
                             fPGameUIMouseListenerLeftScreen.UnregisterListener(castedInterface);
                             fPGameUIMouseListenerLeftScreen.ResetCurrentEngagedData();
                         };
+                        //
                     }
-
+                    theTool.ActivateTool();
                 }
                 else
                 {
@@ -160,23 +179,27 @@ namespace FuzzPhyte.Game.Samples
         /// <param name="thePassedTool">GameObject that contains FP_Tool</param>
         public void UI3DToolButtonPushed(GameObject thePassedTool)
         {
+            ForceResetPreviousTool();
             var theTool = thePassedTool.GetComponent<FP_Tool<FP_MeasureToolData>>();
             if (theTool != null)
             {
                 if (AllMeasureToolsRight.Contains(theTool))
                 {
                     //set the current tool
-                    fPGameUIMouseListenerRightScreen.SetCurrentEngagedData(theTool);
-                    fPGameUIMouseListenerRightScreen.SetCurrentEngagedGameObject(theTool.gameObject);
-                    //activate the tool with it's own data
+                    currentGameObjectTool = thePassedTool;
+                    fPGameUIMouseListenerRightScreen.UI_ToolActivated(theTool);
                     theTool.Initialize(theTool.ToolData);
-                    theTool.ActivateTool();
+     
                     //register the tool 
                     IFPUIEventListener<FP_Tool<FP_MeasureToolData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<FP_MeasureToolData>>;
                     if (castedInterface != null)
                     {
                         //tell our mouse listener to register the current tool
-                        fPGameUIMouseListenerRightScreen.RegisterListener(castedInterface);
+                        theTool.OnActivated+=(tool)=>
+                        {
+                            fPGameUIMouseListenerRightScreen.RegisterListener(castedInterface);
+                        };
+                        
                         //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
                         theTool.OnDeactivated += (tool) =>
                         {
@@ -184,7 +207,7 @@ namespace FuzzPhyte.Game.Samples
                             fPGameUIMouseListenerRightScreen.ResetCurrentEngagedData();
                         };
                     }
-
+                    theTool.ActivateTool();
                 }
                 else
                 {
@@ -202,23 +225,25 @@ namespace FuzzPhyte.Game.Samples
         /// <param name="thePassedTool"></param>
         public void UIMovePanToolButtonPushed(GameObject thePassedTool)
         {
+            ForceResetPreviousTool();
             var theTool = thePassedTool.GetComponent<FP_Tool<PartData>>();
             if (theTool != null)
             {
                 if (AllPartsToolRight.Contains(theTool))
                 {
+                    currentGameObjectTool = thePassedTool;
                     //set the current tool
-                    fPGameUIMouseListenerPartsMove.SetCurrentEngagedData(theTool);
-                    fPGameUIMouseListenerPartsMove.SetCurrentEngagedGameObject(theTool.gameObject);
-                    //activate the tool with it's own data
+                    fPGameUIMouseListenerPartsMove.UI_ToolActivated(theTool);
                     theTool.Initialize(theTool.ToolData);
-                    theTool.ActivateTool();
                     //register the tool 
                     IFPUIEventListener<FP_Tool<PartData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<PartData>>;
                     if (castedInterface != null)
                     {
                         //tell our mouse listener to register the current tool
-                        fPGameUIMouseListenerPartsMove.RegisterListener(castedInterface);
+                        theTool.OnActivated+=(tool)=>
+                        {
+                            fPGameUIMouseListenerPartsMove.RegisterListener(castedInterface);
+                        };
                         //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
                         theTool.OnDeactivated += (tool) =>
                         {
@@ -226,7 +251,8 @@ namespace FuzzPhyte.Game.Samples
                             fPGameUIMouseListenerPartsMove.ResetCurrentEngagedData();
                         };
                     }
-
+                    //
+                    theTool.ActivateTool();
                 }
                 else
                 {
