@@ -2,6 +2,7 @@ namespace FuzzPhyte.Game.Samples
 {
     using FuzzPhyte.Tools;
     using FuzzPhyte.Utility.FPSystem;
+    using FuzzPhyte.Tools.Samples;
 
     /// <summary>
     /// This class will work for any "Measure" tool that extends the FP_Tool class with a FP_MeasureToolData

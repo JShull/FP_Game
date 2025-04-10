@@ -7,6 +7,7 @@ namespace FuzzPhyte.Game.Samples
     using FuzzPhyte.Tools;
     using System.Collections.Generic;
     using FuzzPhyte.Tools.Connections;
+    using FuzzPhyte.Tools.Samples;
 
     public class FPGameManager_ToolExample : FPGenericGameUtility
     {
@@ -16,14 +17,17 @@ namespace FuzzPhyte.Game.Samples
         public FPGameUIMouseListener fPGameUIMouseListenerLeftScreen;
         public FPGameUIMouseListener fPGameUIMouseListenerRightScreen;
         public FPGameUIMouseListenerMove fPGameUIMouseListenerPartsMove;
+        public FPGameUIMouseListenerAttach fpGameUIMouseListenerAttachTool;
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsLeft = new List<FP_Tool<FP_MeasureToolData>>();
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsRight = new List<FP_Tool<FP_MeasureToolData>>();
         public List<FP_Tool<PartData>> AllPartsToolRight = new List<FP_Tool<PartData>>();
+        public List<FP_Tool<FP_AttachToolData>> AllAttachTools = new List<FP_Tool<FP_AttachToolData>>();
         public Button TheMeasureTool2DButton;
         public Button TheMeasureTool3DButton;
         public Button TheMovePanToolButton;
         public Button The2DRemoveLinesButton;
         public Button The3DRemoveLinesButton;
+        public Button TheAttachButton;
         public FP_PanMove TheMoveRotateTool;
         public Slider TheForwardZPlaneSlider;
         protected float sliderLastPos;
@@ -99,6 +103,10 @@ namespace FuzzPhyte.Game.Samples
             {
                 The3DRemoveLinesButton.interactable= true;
             }
+            if(TheAttachButton != null)
+            {
+                TheAttachButton.interactable = true;
+            }
             // we want to stop make sure our overview UI isn't blocking our Tools requirements (OnDrag etc)
         }
         public override void OnClockEnd()
@@ -123,6 +131,18 @@ namespace FuzzPhyte.Game.Samples
             if (TheMovePanToolButton != null)
             {
                 TheMovePanToolButton.interactable = false;
+            }
+            if (The2DRemoveLinesButton != null)
+            {
+                The2DRemoveLinesButton.interactable = false;
+            }
+            if (The3DRemoveLinesButton != null)
+            {
+                The3DRemoveLinesButton.interactable = false;
+            }
+            if (TheAttachButton != null)
+            {
+                TheAttachButton.interactable = false;
             }
             ForceResetPreviousTool();
         }
@@ -159,6 +179,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerLeftScreen.ActivateListener();
             fPGameUIMouseListenerPartsMove.DeactivateListener();
             fPGameUIMouseListenerRightScreen.DeactivateListener();
+            fpGameUIMouseListenerAttachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllMeasureToolsLeft.Contains(theTool))
@@ -208,6 +229,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerLeftScreen.DeactivateListener();
             fPGameUIMouseListenerPartsMove.DeactivateListener();
             fPGameUIMouseListenerRightScreen.ActivateListener();
+            fpGameUIMouseListenerAttachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllMeasureToolsRight.Contains(theTool))
@@ -257,6 +279,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerLeftScreen.DeactivateListener();
             fPGameUIMouseListenerPartsMove.ActivateListener();
             fPGameUIMouseListenerRightScreen.DeactivateListener();
+            fpGameUIMouseListenerAttachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllPartsToolRight.Contains(theTool))
@@ -279,6 +302,51 @@ namespace FuzzPhyte.Game.Samples
                         {
                             fPGameUIMouseListenerPartsMove.UnregisterListener(castedInterface);
                             fPGameUIMouseListenerPartsMove.ResetCurrentEngagedData();
+                        };
+                    }
+                    //
+                    theTool.ActivateTool();
+                }
+                else
+                {
+                    Debug.LogError($"The Tool {theTool} is not in the list of tools!");
+                }
+            }
+            else
+            {
+                Debug.LogError($"The GameObject you passed me, {thePassedTool.name}, does not have a FP_Tool<FP_MeasureToolData> component on it!");
+            }
+        }
+        public void UIAttachToolButtonPushed(GameObject thePassedTool)
+        {
+            ForceResetPreviousTool();
+            var theTool = thePassedTool.GetComponent<FP_Tool<FP_AttachToolData>>();
+            fPGameUIMouseListenerLeftScreen.DeactivateListener();
+            fPGameUIMouseListenerPartsMove.DeactivateListener();
+            fPGameUIMouseListenerRightScreen.DeactivateListener();
+            fpGameUIMouseListenerAttachTool.ActivateListener();
+            if (theTool != null)
+            {
+                if (AllAttachTools.Contains(theTool))
+                {
+                    currentGameObjectTool = thePassedTool;
+                    //set the current tool
+                    fpGameUIMouseListenerAttachTool.UI_ToolActivated(theTool);
+                    theTool.Initialize(theTool.ToolData);
+                    //register the tool 
+                    IFPUIEventListener<FP_Tool<FP_AttachToolData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<FP_AttachToolData>>;
+                    if (castedInterface != null)
+                    {
+                        //tell our mouse listener to register the current tool
+                        theTool.OnActivated += (tool) =>
+                        {
+                            fpGameUIMouseListenerAttachTool.RegisterListener(castedInterface);
+                        };
+                        //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
+                        theTool.OnDeactivated += (tool) =>
+                        {
+                            fpGameUIMouseListenerAttachTool.UnregisterListener(castedInterface);
+                            fpGameUIMouseListenerAttachTool.ResetCurrentEngagedData();
                         };
                     }
                     //
