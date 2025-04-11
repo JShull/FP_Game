@@ -1,8 +1,8 @@
 {
     "name": "com.fuzzphyte.game",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "displayName": "FP Game",
-    "description": "FP Game is a library to setup base 'game managers'. This is an extension of Utility and Events combined.",
+    "description": "FP Game is a library to setup base 'game managers'. This is an extension of Utility, Events, UI, and Tools combined.",
     "unity": "2022.3",
     "unityRelease": "32f1",
     "documentationUrl": "https://github.com/jshull/FP_Game/blob/main/README.md",
@@ -20,7 +20,8 @@
       "com.fuzzphyte.utility":"https://github.com/jshull/FP_Utility.git",
       "com.fuzzphyte.systemevent":"https://github.com/jshull/FP_Event.git",
       "com.fuzzphyte.ui":"https://github.com/jshull/FP_UI.git",
-      "com.fuzzphyte.utility.analytics":"https://github.com/JShull/FP_Utility_Analytics.git"
+      "com.fuzzphyte.utility.analytics":"https://github.com/JShull/FP_Utility_Analytics.git",
+      "com.fuzzphyte.tools":"https://github.com/JShull/FP_Tools.git"
     },
     "samples": [
       {

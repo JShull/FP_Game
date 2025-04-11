@@ -18,16 +18,20 @@ namespace FuzzPhyte.Game.Samples
         public FPGameUIMouseListener fPGameUIMouseListenerRightScreen;
         public FPGameUIMouseListenerMove fPGameUIMouseListenerPartsMove;
         public FPGameUIMouseListenerAttach fpGameUIMouseListenerAttachTool;
+        public FPGameUIMouseListenerDetach fpGameUIMouseListenerDetachTool;
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsLeft = new List<FP_Tool<FP_MeasureToolData>>();
         public List<FP_Tool<FP_MeasureToolData>> AllMeasureToolsRight = new List<FP_Tool<FP_MeasureToolData>>();
-        public List<FP_Tool<PartData>> AllPartsToolRight = new List<FP_Tool<PartData>>();
+        public List<FP_Tool<PartData>> AllMoveParts = new List<FP_Tool<PartData>>();
         public List<FP_Tool<FP_AttachToolData>> AllAttachTools = new List<FP_Tool<FP_AttachToolData>>();
+        public List<FP_Tool<FP_DetachToolData>> AllDetachTools = new List<FP_Tool<FP_DetachToolData>>();
         public Button TheMeasureTool2DButton;
         public Button TheMeasureTool3DButton;
         public Button TheMovePanToolButton;
         public Button The2DRemoveLinesButton;
         public Button The3DRemoveLinesButton;
         public Button TheAttachButton;
+        public Button TheDetachButton;
+        public List<GameObject> AllButtonSelectIcons = new List<GameObject>();
         public FP_PanMove TheMoveRotateTool;
         public Slider TheForwardZPlaneSlider;
         protected float sliderLastPos;
@@ -83,30 +87,7 @@ namespace FuzzPhyte.Game.Samples
             GameClock.TheClock.StartClockReporter();
             base.StartEngine();
             useUnityEventsPlane = true;
-            if (TheMeasureTool2DButton != null)
-            {
-                TheMeasureTool2DButton.interactable = true;
-            }
-            if (TheMeasureTool3DButton != null)
-            {
-                TheMeasureTool3DButton.interactable = true;
-            }
-            if (TheMovePanToolButton != null)
-            {
-                TheMovePanToolButton.interactable = true;
-            }
-            if (The2DRemoveLinesButton != null)
-            {
-                The2DRemoveLinesButton.interactable = true;
-            }
-            if(The3DRemoveLinesButton!= null)
-            {
-                The3DRemoveLinesButton.interactable= true;
-            }
-            if(TheAttachButton != null)
-            {
-                TheAttachButton.interactable = true;
-            }
+            TurnOffOnButtons(true);
             // we want to stop make sure our overview UI isn't blocking our Tools requirements (OnDrag etc)
         }
         public override void OnClockEnd()
@@ -120,41 +101,86 @@ namespace FuzzPhyte.Game.Samples
         public override void StopEngine()
         {
             base.StopEngine();
-            if (TheMeasureTool2DButton != null)
-            {
-                TheMeasureTool2DButton.interactable = false;
-            }
-            if (TheMeasureTool3DButton != null)
-            {
-                TheMeasureTool3DButton.interactable = false;
-            }
-            if (TheMovePanToolButton != null)
-            {
-                TheMovePanToolButton.interactable = false;
-            }
-            if (The2DRemoveLinesButton != null)
-            {
-                The2DRemoveLinesButton.interactable = false;
-            }
-            if (The3DRemoveLinesButton != null)
-            {
-                The3DRemoveLinesButton.interactable = false;
-            }
-            if (TheAttachButton != null)
-            {
-                TheAttachButton.interactable = false;
-            }
+            TurnOffOnButtons(false);
             ForceResetPreviousTool();
         }
         public override void PauseEngine()
         {
             base.PauseEngine();
+            ResetIcons();
+            foreach (var tool in AllMeasureToolsLeft)
+            {
+                tool.DeactivateToolFromUI();
+            }
+            foreach (var tool in AllMeasureToolsRight)
+            {
+                tool.DeactivateToolFromUI();
+            }
+            foreach (var tool in AllMoveParts)
+            {
+                tool.DeactivateToolFromUI();
+            }
+            foreach (var tool in AllAttachTools)
+            {
+                tool.DeactivateToolFromUI();
+            }
+            foreach (var tool in AllDetachTools)
+            {
+                tool.DeactivateToolFromUI();
+            }
+            //buttons
+            TurnOffOnButtons(false);
             OnUnityGamePausedEvent?.Invoke();
         }
         public override void ResumeEngine()
         {
             base.ResumeEngine();
+            //buttons
+            TurnOffOnButtons(true);
             OnUnityGameUnPausedEvent?.Invoke();
+        }
+        protected void TurnOffOnButtons(bool status)
+        {
+            if (TheMeasureTool2DButton != null)
+            {
+                TheMeasureTool2DButton.interactable = status;
+            }
+            if (TheMeasureTool3DButton != null)
+            {
+                TheMeasureTool3DButton.interactable = status;
+            }
+            if (TheMovePanToolButton != null)
+            {
+                TheMovePanToolButton.interactable = status;
+            }
+            if (The2DRemoveLinesButton != null)
+            {
+                The2DRemoveLinesButton.interactable = status;
+            }
+            if(The3DRemoveLinesButton!= null)
+            {
+                The3DRemoveLinesButton.interactable= status;
+            }
+            if(TheAttachButton != null)
+            {
+                TheAttachButton.interactable = status;
+            }
+            if(TheDetachButton != null)
+            {
+                TheDetachButton.interactable = status;
+            }
+            if(TheForwardZPlaneSlider != null)
+            {
+                //always disable the slider
+                TheForwardZPlaneSlider.interactable = false;
+            }
+        }
+        public void ResetIcons()
+        {
+            foreach (var gO in AllButtonSelectIcons)
+            {
+                gO.SetActive(false);
+            }
         }
         #endregion
         protected void ForceResetPreviousTool()
@@ -180,6 +206,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerPartsMove.DeactivateListener();
             fPGameUIMouseListenerRightScreen.DeactivateListener();
             fpGameUIMouseListenerAttachTool.DeactivateListener();
+            fpGameUIMouseListenerDetachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllMeasureToolsLeft.Contains(theTool))
@@ -230,6 +257,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerPartsMove.DeactivateListener();
             fPGameUIMouseListenerRightScreen.ActivateListener();
             fpGameUIMouseListenerAttachTool.DeactivateListener();
+            fpGameUIMouseListenerDetachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllMeasureToolsRight.Contains(theTool))
@@ -280,9 +308,10 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerPartsMove.ActivateListener();
             fPGameUIMouseListenerRightScreen.DeactivateListener();
             fpGameUIMouseListenerAttachTool.DeactivateListener();
+            fpGameUIMouseListenerDetachTool.DeactivateListener();
             if (theTool != null)
             {
-                if (AllPartsToolRight.Contains(theTool))
+                if (AllMoveParts.Contains(theTool))
                 {
                     currentGameObjectTool = thePassedTool;
                     //set the current tool
@@ -317,6 +346,10 @@ namespace FuzzPhyte.Game.Samples
                 Debug.LogError($"The GameObject you passed me, {thePassedTool.name}, does not have a FP_Tool<FP_MeasureToolData> component on it!");
             }
         }
+        /// <summary>
+        /// Called from the UI button to activate the Attach/Weld Tool
+        /// </summary>
+        /// <param name="thePassedTool"></param>
         public void UIAttachToolButtonPushed(GameObject thePassedTool)
         {
             ForceResetPreviousTool();
@@ -325,6 +358,7 @@ namespace FuzzPhyte.Game.Samples
             fPGameUIMouseListenerPartsMove.DeactivateListener();
             fPGameUIMouseListenerRightScreen.DeactivateListener();
             fpGameUIMouseListenerAttachTool.ActivateListener();
+            fpGameUIMouseListenerDetachTool.DeactivateListener();
             if (theTool != null)
             {
                 if (AllAttachTools.Contains(theTool))
@@ -362,6 +396,56 @@ namespace FuzzPhyte.Game.Samples
                 Debug.LogError($"The GameObject you passed me, {thePassedTool.name}, does not have a FP_Tool<FP_MeasureToolData> component on it!");
             }
         }
+        /// <summary>
+        /// Called from the UI Button to activate the detach/grind tool
+        /// </summary>
+        /// <param name="thePassedTool"></param>
+        public void UIDetachToolButtonPushed(GameObject thePassedTool)
+        {
+            ForceResetPreviousTool();
+            var theTool = thePassedTool.GetComponent<FP_Tool<FP_DetachToolData>>();
+            fPGameUIMouseListenerLeftScreen.DeactivateListener();
+            fPGameUIMouseListenerPartsMove.DeactivateListener();
+            fPGameUIMouseListenerRightScreen.DeactivateListener();
+            fpGameUIMouseListenerAttachTool.DeactivateListener();
+            fpGameUIMouseListenerDetachTool.ActivateListener();
+            if (theTool != null)
+            {
+                if (AllDetachTools.Contains(theTool))
+                {
+                    currentGameObjectTool = thePassedTool;
+                    //set the current tool
+                    fpGameUIMouseListenerDetachTool.UI_ToolActivated(theTool);
+                    theTool.Initialize(theTool.ToolData);
+                    //register the tool 
+                    IFPUIEventListener<FP_Tool<FP_DetachToolData>> castedInterface = theTool as IFPUIEventListener<FP_Tool<FP_DetachToolData>>;
+                    if (castedInterface != null)
+                    {
+                        //tell our mouse listener to register the current tool
+                        theTool.OnActivated += (tool) =>
+                        {
+                            fpGameUIMouseListenerDetachTool.RegisterListener(castedInterface);
+                        };
+                        //I want to tell the tool to Unregister itself with the mouse listener when it's deactivated
+                        theTool.OnDeactivated += (tool) =>
+                        {
+                            fpGameUIMouseListenerDetachTool.UnregisterListener(castedInterface);
+                            fpGameUIMouseListenerDetachTool.ResetCurrentEngagedData();
+                        };
+                    }
+                    //
+                    theTool.ActivateTool();
+                }
+                else
+                {
+                    Debug.LogError($"The Tool {theTool} is not in the list of tools!");
+                }
+            }
+            else
+            {
+                Debug.LogError($"The GameObject you passed me, {thePassedTool.name}, does not have a FP_Tool<FP_MeasureToolData> component on it!");
+            }
+        }
         public void UISliderZPlaneChange(float sliderValue)
         {
             var curSliderValue = sliderValue;
@@ -376,7 +460,6 @@ namespace FuzzPhyte.Game.Samples
             }
             sliderLastPos = curSliderValue;
         }
-
         public void UI2DToolRemoveLines(GameObject thePassedTool)
         {
             var theTool = thePassedTool.GetComponent<FP_Tool<FP_MeasureToolData>>();
