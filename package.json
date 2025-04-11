@@ -19,9 +19,7 @@
       "com.unity.burst":"1.8.18",
       "com.fuzzphyte.utility":"https://github.com/jshull/FP_Utility.git",
       "com.fuzzphyte.systemevent":"https://github.com/jshull/FP_Event.git",
-      "com.fuzzphyte.ui":"https://github.com/jshull/FP_UI.git",
-      "com.fuzzphyte.utility.analytics":"https://github.com/jshull/FP_Utility_Analytics.git",
-      "com.fuzzphyte.tools":"https://github.com/jshull/FP_Tool.git"
+      "com.fuzzphyte.ui":"https://github.com/jshull/FP_UI.git"
     },
     "samples": [
       {
