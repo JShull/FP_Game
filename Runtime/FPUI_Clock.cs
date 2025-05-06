@@ -52,7 +52,7 @@ namespace FuzzPhyte.Game
                     ClockText.color = curTheme.FontSettings[0].FontColor;
                     //ClockText.autoSizeTextContainer = curTheme.FontSettings[0].UseAutoSizing;
                 }else{
-                    ClockText.color = curTheme.FontPrimaryColor;
+                    //ClockText.color = curTheme.FontPrimaryColor;
                 }
             }
         }
